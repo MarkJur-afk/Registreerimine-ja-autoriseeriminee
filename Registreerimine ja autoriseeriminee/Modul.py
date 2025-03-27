@@ -4,6 +4,8 @@ kasutajad = []  # Список пользователей
 paroolid = []   # Список паролей
 
 def genereeri_parool(length: int) -> str:  # Генерация пароля
+    """Genereerib parooli
+    """    
     sumbolid = ".,:;!_*-+()/#¤%&"  # Допустимые символы
     numbrid = '0123456789'  # Числа
     kirju = 'qwertyuiopasdfghjklzxcvbnm'  # Маленькие буквы
@@ -12,6 +14,8 @@ def genereeri_parool(length: int) -> str:  # Генерация пароля
     return ''.join(random.choice(all) for i in range(length))  # Генерация случайного пароля
 
 def kontrolli_parooli(password: str) -> bool:  # Проверка пароля
+    """Kontrollib, kas parool vastab nõuetele.
+    """    
     if (any(i.isdigit() for i in password) and  # Проверяем, есть ли цифры
         any(i.islower() for i in password) and  # Проверяем, есть ли строчные буквы
         any(i.isupper() for i in password) and  # Проверяем, есть ли заглавные буквы
@@ -20,6 +24,8 @@ def kontrolli_parooli(password: str) -> bool:  # Проверка пароля
     return False  # Пароль не соответствует требованиям
 
 def registreeri_kasutaja(username: str, password: str) -> bool:  # Регистрация пользователя
+    """Registreerib uue kasutaja.
+    """    
     if username in kasutajad:
         return False  # Пользователь уже существует
     kasutajad.append(username)  # Добавляем имя пользователя в список
@@ -27,12 +33,16 @@ def registreeri_kasutaja(username: str, password: str) -> bool:  # Регист�
     return True  # Регистрация успешна
 
 def autoriseeri_kasutaja(username: str, password: str) -> bool:  # Авторизация пользователя
+    """Autoriseerib kasutaja.
+    """    
     if username in kasutajad:
         check = kasutajad.index(username)  # Находим индекс пользователя
         return paroolid[check] == password  # Проверяем, совпадает ли пароль
     return False  # Неверное имя пользователя или пароль
 
 def muuda_parooli(username: str, new_password: str) -> bool:  # Изменение пароля
+    """Muudab kasutaja parooli.
+    """    
     if username in kasutajad:
         check = kasutajad.index(username)  # Находим индекс пользователя
         paroolid[check] = new_password  # Меняем пароль на новый
@@ -40,6 +50,8 @@ def muuda_parooli(username: str, new_password: str) -> bool:  # Изменени
     return False  # Пользователь не найден
 
 def unusta_parool(username: str) -> str:  # Восстановление пароля
+    """Luuakse kasutajale uus parool.
+    """    
     if username in kasutajad:
         check = kasutajad.index(username)  # Находим индекс пользователя
         new_password = genereeri_parool(10)  # Генерируем новый пароль
