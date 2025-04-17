@@ -29,12 +29,19 @@ def load_users():
     try:
         with open("users.txt", "r", encoding="utf-8") as file:
             for line in file:
-                login, password, email = line.strip().split(":")
-                logins.append(login)
-                passwords.append(password)
-                emails.append(email)
+                parts = line.strip().split(":")
+                if len(parts) == 3:
+                    login, password, email = parts
+                    logins.append(login)
+                    passwords.append(password)
+                    emails.append(email)
+                else:
+                    print(f"Invalid line format: {line.strip()}")
     except FileNotFoundError:
-        pass
+        print("The file 'users.txt' was not found. Starting with an empty user list.")
+    except Exception as e:
+        print(f"An unexpected error occurred while loading users: {e}")
+
 
 def save_users():
     with open("users.txt", "w", encoding="utf-8") as file:
@@ -59,6 +66,7 @@ def send_email_notification(to_email: str, subject: str, content: str):
             server.starttls(context=ssl.create_default_context())
             server.login(from_email, password)
             server.send_message(msg)
+        print("On registreeritud")
     except Exception as e:
         print("Email saatmine ebaõnnestus:", e)
 
@@ -74,12 +82,18 @@ def authorize(login: str, password: str) -> str:
 def register(login: str, password: str, email: str) -> str:
     if login in logins:
         return 'Kasutajanimi on juba võetud'
+    elif email in emails:
+        return 'E-mail on juba kasutusel'
     else:
         logins.append(login)
         passwords.append(password)
         emails.append(email)
         save_users()
-        send_email_notification(email, "Registreerimine", f"Tere {login}, olete edukalt registreeritud!")
+        send_email_notification(
+            email,
+            "Registreerimine",
+            f"Tere {login}, olete edukalt registreeritud!\nTeie kasutajanimi: {login}\nTeie parool: {password}"
+        )
         return 'Kasutaja on registreeritud'
 
 # Смена пароля
@@ -91,7 +105,11 @@ def change_password():
             new_password = input('Sisestage uus parool: ')
             passwords[logins.index(login)] = new_password
             save_users()
-            send_email_notification(emails[logins.index(login)], "Parooli muutmine", f"Tere {login}, teie parool on edukalt muudetud.")
+            send_email_notification(
+                emails[logins.index(login)],
+                "Parooli muutmine",
+                f"Tere {login}, teie parool on edukalt muudetud."
+            )
             return 'Parool on muudetud'
         else:
             return 'Vale parool'
@@ -104,7 +122,11 @@ def password_recovery():
         new_password = generate_password(16)
         passwords[logins.index(login)] = new_password
         save_users()
-        send_email_notification(emails[logins.index(login)], "Parooli taastamine", f"Tere {login}, teie uus parool on: {new_password}")
+        send_email_notification(
+            emails[logins.index(login)],
+            "Parooli taastamine",
+            f"Tere {login}, teie uus parool on: {new_password}"
+        )
         print(f"Uus parool: {new_password}")
         return 'Parool on taastatud'
     else:
